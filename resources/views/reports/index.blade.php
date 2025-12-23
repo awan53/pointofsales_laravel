@@ -37,6 +37,33 @@
         </div>
     </div>
 
+    <div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('reports.index') }}" class="row align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Dari Tanggal</label>
+                <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sampai Tanggal</label>
+                <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">Cari Pemasukan</button>
+                <a href="{{ route('reports.index') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Tampilkan hasil jika filter aktif --}}
+@if(request()->filled('start_date'))
+<div class="alert alert-info">
+    Pemasukan dari <strong>{{ $startDate }}</strong> sampai <strong>{{ $endDate }}</strong> adalah: 
+    <strong>Rp {{ number_format($omzetPeriode, 0, ',', '.') }}</strong>
+</div>
+@endif
+
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow">
