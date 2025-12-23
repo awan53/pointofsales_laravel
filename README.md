@@ -1,3 +1,18 @@
-# Point of Sales Laravel
+# Point of Sales (POS) Laravel
 
-Aplikasi POS berbasis Laravel untuk manajemen penjualan.
+Aplikasi Point of Sales berbasis Laravel untuk membantu proses penjualan dan manajemen toko.
+
+## ✨ Fitur
+- Manajemen Produk
+- Transaksi Penjualan
+- Laporan Penjualan
+- Manajemen User
+
+## 🛠 Tech Stack
+- Laravel
+- PHP
+- MySQL
+- Bootstrap
+
+## 👤 Author
+Muhammad Gunawan
