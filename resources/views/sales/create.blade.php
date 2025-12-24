@@ -51,25 +51,37 @@
         </div>
 
         {{-- Form Pembayaran --}}
-        <div class="row">
-            <div class="col-md-5 offset-md-7">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="form-group mb-3">
-                            <label class="fw-bold">💰 Uang Dibayarkan (Tunai)</label>
-                            <input type="number" name="paid" id="paid" class="form-control form-control-lg" required min="0" placeholder="0">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="fw-bold">💵 Kembalian</label>
-                            <input type="text" name="change" id="change-display" class="form-control form-control-lg bg-light" readonly value="Rp 0">
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-2 shadow">
-                            💾 Simpan Transaksi
-                        </button>
+        {{-- Form Pembayaran --}}
+<div class="row">
+    <div class="col-md-5 offset-md-7">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label class="fw-bold">💳 Metode Pembayaran</label>
+                    <select name="payment_method" id="payment_method" class="form-control form-control-lg" required>
+                        <option value="cash">💵 Tunai (Cash)</option>
+                        <option value="qris">📱 QRIS (E-Wallet)</option>
+                    </select>
+                </div>
+
+                <div id="cash-section">
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">💰 Uang Dibayarkan (Tunai)</label>
+                        <input type="number" name="paid" id="paid" class="form-control form-control-lg" min="0" placeholder="0">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">💵 Kembalian</label>
+                        <input type="text" id="change-display" class="form-control form-control-lg bg-light" readonly value="Rp 0">
                     </div>
                 </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-2 shadow">
+                    💾 Simpan Transaksi
+                </button>
             </div>
         </div>
+    </div>
+</div>
     </form>
 </div>
 
@@ -114,6 +126,27 @@
         const paidInput = document.getElementById('paid');
         const changeDisplay = document.getElementById('change-display');
 
+        // === TAMBAHAN BARU DI SINI ===
+        const paymentMethod = document.getElementById('payment_method');
+        const cashSection = document.getElementById('cash-section');
+
+        if (paymentMethod) {
+            paymentMethod.addEventListener('change', function() {
+                if (this.value === 'qris') {
+                    cashSection.style.display = 'none'; // Sembunyikan input uang tunai
+                    paidInput.required = false;         // Tidak wajib diisi
+                    paidInput.value = 0;                // Set ke 0 agar tidak error saat simpan
+                    calculateChange();                  // Update tampilan kembalian
+                } else {
+                    cashSection.style.display = 'block'; // Munculkan kembali jika pilih Cash
+                    paidInput.required = true;
+                    paidInput.value = '';
+                    calculateChange();
+                }
+            });
+        }
+        // =============================
+
         // Fungsi format Rupiah
         const formatRupiah = (number) => {
             return new Intl.NumberFormat('id-ID', {
@@ -147,13 +180,11 @@
                 const subtotalText = row.querySelector('.subtotal-text');
                 const subtotalValue = row.querySelector('.subtotal-value');
 
-                // Ambil data dari attribute option
                 const selectedOption = select.options[select.selectedIndex];
                 const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
                 const qty = parseInt(qtyInput.value) || 0;
                 const stock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
 
-                // Validasi Stok di Sisi Client
                 if (qty > stock) {
                     alert(`Stok tidak mencukupi! Sisa stok: ${stock}`);
                     qtyInput.value = stock;
@@ -161,7 +192,6 @@
 
                 const subtotal = price * qty;
 
-                // Tampilkan hasil
                 priceText.innerText = formatRupiah(price);
                 subtotalText.innerText = formatRupiah(subtotal);
                 subtotalValue.value = subtotal;
@@ -184,13 +214,13 @@
         paidInput.addEventListener('input', calculateChange);
 
         function calculateChange() {
-            const total = parseFloat(grandTotalDisplay.innerText.replace(/[^0-9]/g, '')) || 0;
+            const totalText = grandTotalDisplay.innerText.replace(/[^0-9]/g, '');
+            const total = parseFloat(totalText) || 0;
             const paid = parseFloat(paidInput.value) || 0;
             const change = paid - total;
 
             changeDisplay.value = formatRupiah(change >= 0 ? change : 0);
             
-            // Beri warna merah jika uang kurang
             if (change < 0) {
                 changeDisplay.classList.add('text-danger');
             } else {
@@ -198,7 +228,6 @@
             }
         }
 
-        // Tambahkan satu baris otomatis saat pertama kali dibuka
         addItemBtn.click();
     });
 </script>

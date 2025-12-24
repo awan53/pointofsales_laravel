@@ -9,6 +9,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\MidtransWebhookController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,6 +20,7 @@ use App\Http\Controllers\ReportController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+ Route::post('/api/midtrans-callback', [MidtransWebhookController::class, 'handler']);
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -55,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
     // --- MODUL KASIR (Penjualan) ---
     Route::middleware(['role:admin,kasir'])->group(function () {
         Route::resource('sales', SaleController::class);
+       
     });
 });
 // Route::resource('categories', CategoryController::class);

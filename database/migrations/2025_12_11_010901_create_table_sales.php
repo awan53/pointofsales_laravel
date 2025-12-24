@@ -19,6 +19,12 @@ return new class extends Migration
             $table->id();
             $table->string('invoice')->unique();
             $table->timestamp('sales_date')->useCurrent();
+            //---------------//
+            //field tambahan untuk payment Midtrans
+            $table->string('payment_method')->default('cash'); // 'cash' atau 'qris'
+            $table->string('status')->default('success'); // 'pending', 'success', 'failed'
+            $table->string('snap_token')->nullable(); // Untuk menyimpan token dari Midtrans
+            //---------------//
             $table->decimal('total', 15, 2)->default(0);
             $table->decimal('paid', 15, 2)->default(0);
             $table->decimal('change', 15, 2)->default(0);

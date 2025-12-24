@@ -12,11 +12,14 @@ class Sale extends Model
     protected $table = 'table_sales';
 
     protected $fillable = [
-        'invoice',
-        'sales_date',
-        'total',
-        'paid',
-        'change',
+        'invoice', 
+        'sales_date', 
+        'payment_method', 
+        'total', 
+        'paid', 
+        'change', 
+        'status', 
+        'snap_token'
     ];
 
     protected static function boot()

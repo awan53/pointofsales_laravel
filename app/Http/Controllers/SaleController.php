@@ -8,6 +8,8 @@ use App\Models\SaleItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class SaleController extends Controller
 {
@@ -50,18 +52,25 @@ public function store(Request $request)
     if (!$request->has('product_id')) {
         return back()->withErrors(['error' => 'Minimal harus ada 1 produk!']);
     }
+    Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+    Config::$isProduction = env('MIDTRANS_IS_PRODUCTION');
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
+
 
     DB::beginTransaction();
     try {
         // Ganti str_random(5) menjadi Str::random(5)
-        $invoice = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+        $invoice = 'INV-' . date('YmdHis') . '-' . rand(100, 999);
 
         $sale = Sale::create([
-            'invoice'        => $invoice,
-            'sales_date'      => now(),
-            'total'          => 0,
-            'paid'           => $request->paid,
-            'change'         => 0,
+            'invoice'           => $invoice,
+            'sales_date'        => now(),
+            'payment_method'    => $request->payment_method,
+            'total'             => 0,
+            'paid'              => $request->payment_method== 'qris' ? 0 : $request->paid,
+            'status'            =>  $request->payment_method== 'qris' ? 'pending' : 'success',
+            'change'            => 0,
         ]);
 
         $grandTotal = 0;
@@ -87,9 +96,27 @@ public function store(Request $request)
 
             $product->decrement('stock', $qty);
         }
-        $change = $request->paid - $grandTotal;
+        $change = ($request->payment_method == 'qris') ? 0 : ($request->paid - $grandTotal);
         $sale->update(['total' => $grandTotal,
                         'change' => $change]);
+
+        if ($request->payment_method=='qris'){
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $invoice,
+                    'gross_amount' => (int)$grandTotal,
+                ],
+                'customer_details' => [
+                    'first_name' => 'pelanggan Toko',
+                ],
+            ];
+
+            $snapToken = Snap::getSnapToken($params);
+            $sale->update(['snap_token' => $snapToken]);
+
+            DB::commit();
+            return redirect()->route('sales.show', $sale->id);
+        }
 
         DB::commit();
         return redirect()->route('sales.index')->with('success', 'Transaksi Berhasil!');
