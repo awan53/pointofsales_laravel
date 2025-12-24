@@ -4,7 +4,7 @@ Aplikasi Point of Sales berbasis Laravel untuk membantu proses penjualan dan man
 
 ## ✨ Fitur
 - Manajemen Produk
-- Transaksi Penjualan
+- Transaksi Penjualan cash dan Qris
 - Laporan Penjualan
 - Manajemen User
 
@@ -13,6 +13,10 @@ Aplikasi Point of Sales berbasis Laravel untuk membantu proses penjualan dan man
 - PHP
 - MySQL
 - Bootstrap
+- NGROK
+
+## 🛠 Payment Gatway
+- Midtrans
 
 ## 👤 Author
 Muhammad Gunawan
